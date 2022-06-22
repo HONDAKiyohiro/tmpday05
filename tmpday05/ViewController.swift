@@ -17,7 +17,6 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-
         checkAuthorizationStatus()
     }
     
@@ -65,26 +64,36 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     }
     
     
-    
-    
     func displayUI(){
         let statusBarHeight = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
-        // サイズと位置調整
+        
+        button1.frame = CGRect(x: 40, y:50, width: 150, height:50)
+        button1.frame.origin.x = self.view.frame.width/2 - button1.frame.size.width/2
+        button1.setTitle("Clean Up!", for: UIControl.State.normal)
+        button1.titleLabel?.font = UIFont.systemFont(ofSize: 30)
+        button1.titleLabel?.adjustsFontSizeToFitWidth = true
+        button1.layer.cornerRadius = 10
+        button1.layer.borderWidth = 1
+        self.view.addSubview(button1)
+        button1.addTarget(self, action: #selector(self.deleteRecords(sender:)), for: .touchUpInside)
+
         tableView.frame = CGRect(
             x: 0,
-            y: statusBarHeight,
+            y: statusBarHeight + 50 + button1.frame.height,
             width: self.view.frame.width,
             height: self.view.frame.height - statusBarHeight
         )
-        
         // Delegate設定
         tableView.delegate = self
-        
         // DataSource設定
         tableView.dataSource = self
-        
         // 画面に UITableView を追加
         self.view.addSubview(tableView)
+ }
+    
+    @objc
+    func deleteRecords(sender: Any){
+        print("function deleteRecords is called")
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
