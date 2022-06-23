@@ -11,8 +11,10 @@ import Contacts
 class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSource{
 
     let prefectures = ["東京都", "神奈川県", "千葉県", "埼玉県", "茨城県", "栃木県", "群馬県", "北海道", "青森県", "秋田県", "岩手県", "山形県", "神奈川県", "とてもながーーーーーーーーーーーい県", "静岡県", "愛知県"]
+    var numberInGroups: [[String: [String:Int]]]
     let tableView = UITableView()
     let button1 =  UIButton(type: UIButton.ButtonType.system)
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +24,15 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     
     override func viewDidAppear(_ animated: Bool) {
         displayUI()
+        
+        //test code
+        var numberInGroups =
+            [
+                ["Container1": ["group1InCon1":1, "group2InCon1":2]],
+                ["Container2": ["group1InCon2":3, "group2InCon2":4]],
+                ["Container3": ["group1InCon3":5]]
+            ]
+
     }
 
     func checkAuthorizationStatus(){
@@ -66,7 +77,7 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     
     func displayUI(){
         let statusBarHeight = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
-        
+
         button1.frame = CGRect(x: 40, y:50, width: 150, height:50)
         button1.frame.origin.x = self.view.frame.width/2 - button1.frame.size.width/2
         button1.setTitle("Clean Up!", for: UIControl.State.normal)
@@ -83,12 +94,13 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
             width: self.view.frame.width,
             height: self.view.frame.height - statusBarHeight
         )
+        self.view.addSubview(tableView)
         // Delegate設定
         tableView.delegate = self
         // DataSource設定
         tableView.dataSource = self
         // 画面に UITableView を追加
-        self.view.addSubview(tableView)
+
  }
     
     @objc
@@ -101,8 +113,8 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        // セルを作る
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
+        // 一つ一つのセルを作る
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         cell.accessoryType = .checkmark
         cell.textLabel?.text = "セル\(indexPath.row + 1)は\(self.prefectures[indexPath.row])"
         cell.detailTextLabel?.text = "\(indexPath.row + 1)番目のセルの説明"
@@ -111,12 +123,16 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            // セルがタップされた時の処理
-            print("タップされたセルのindex番号は: \(indexPath.row)")
-        }
+        // セルがタップされた時の処理
+        print("タップされたセルのindex番号は: \(indexPath.row)")
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+    }
     
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
         // アクセサリボタン（セルの右にあるボタン）がタップされた時の処理
+        // この関数は、アクセサリの種類が.checkmarkの場合は呼ばれないので、
+        // 内容は空でも良いのだが、将来種類を変えた時のために便宜上書いておく。
         print("タップされたアクセサリがあるセルのindex番号: \(indexPath.row)")
     }
 
