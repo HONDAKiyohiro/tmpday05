@@ -10,8 +10,10 @@ import Contacts
 
 class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSource{
 
-    let prefectures = ["東京都", "神奈川県", "千葉県", "埼玉県", "茨城県", "栃木県", "群馬県", "北海道", "青森県", "秋田県", "岩手県", "山形県", "神奈川県", "とてもながーーーーーーーーーーーい県", "静岡県", "愛知県"]
-    var numberInGroups: [[String: [String:Int]]]
+    var containers: [CNContainer] = []
+    var groups: [CNGroup] = []
+    var containersArray: [String] = []
+    var groupsArray: [String] = []
     let tableView = UITableView()
     let button1 =  UIButton(type: UIButton.ButtonType.system)
 
@@ -24,15 +26,7 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     
     override func viewDidAppear(_ animated: Bool) {
         displayUI()
-        
-        //test code
-        var numberInGroups =
-            [
-                ["Container1": ["group1InCon1":1, "group2InCon1":2]],
-                ["Container2": ["group1InCon2":3, "group2InCon2":4]],
-                ["Container3": ["group1InCon3":5]]
-            ]
-
+        refreshGroupTable()
     }
 
     func checkAuthorizationStatus(){
@@ -100,8 +94,47 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
         // DataSource設定
         tableView.dataSource = self
         // 画面に UITableView を追加
+    }
+    
+    func refreshGroupTable(){
+        /*
+         contactstore1にアクセスして、各コンテナ内のグループを
+         cellMainTitlesとcellSubTilesに設定する
+        */
+//      いまはダミーコードを入れておく
+//        groupsArray = ["g0c0", "g1c0", "g2c0", "g0c1", "g1c1"]
+//        containersArray  = ["c0", "c0", "c0", "c1", "c1"]
+        let store = CNContactStore()
+        do {
+            containers = try store.containers(matching: nil)
+        } catch{
+            print(error)
+        }
+        print("Number of containers is \(containers.count)")
+        for container in containers {
+            print("container is \(container)")
+            let fetchPredicate = CNGroup.predicateForGroupsInContainer(withIdentifier: container.identifier)
+            do {
+                let groupsInOneContainer = try store.groups(matching: fetchPredicate)
+                if (groupsInOneContainer.count == 0) {
+                    containersArray.append(container.name != "" ? container.name : "local")
+                    groupsArray.append("グループ無し")
+                } else{
+                    for group in groupsInOneContainer {
+                        containersArray.append(container.name != "" ? container.name : "local")
+                        groupsArray.append(group.name)
+                    }
 
- }
+                }
+            } catch {
+                print("Error fetching in containers")
+            }
+        }
+        
+        
+        tableView.reloadData()
+    }
+    
     
     @objc
     func deleteRecords(sender: Any){
@@ -109,16 +142,15 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.prefectures.count;
+        return groupsArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // 一つ一つのセルを作る
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         cell.accessoryType = .checkmark
-        cell.textLabel?.text = "セル\(indexPath.row + 1)は\(self.prefectures[indexPath.row])"
-        cell.detailTextLabel?.text = "\(indexPath.row + 1)番目のセルの説明"
-        
+        cell.textLabel?.text = groupsArray[indexPath.row]
+        cell.detailTextLabel?.text = containersArray[indexPath.row]
         return cell
     }
     
