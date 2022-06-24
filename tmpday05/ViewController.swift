@@ -14,6 +14,7 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     var groups: [CNGroup] = []
     let tableView = UITableView()
     let button1 =  UIButton(type: UIButton.ButtonType.system)
+    let labelMessage = UILabel()
     
     struct ContactsFolder {
         enum FolderType {
@@ -44,7 +45,7 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     func displayUI(){
         let statusBarHeight = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
 
-        button1.frame = CGRect(x: 40, y:50, width: 150, height:50)
+        button1.frame = CGRect(x: 40, y:statusBarHeight + 20, width: 150, height:50)
         button1.frame.origin.x = self.view.frame.width/2 - button1.frame.size.width/2
         button1.setTitle("Clean Up!", for: UIControl.State.normal)
         button1.titleLabel?.font = UIFont.systemFont(ofSize: 30)
@@ -54,11 +55,16 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
         self.view.addSubview(button1)
         button1.addTarget(self, action: #selector(self.deleteRecords(sender:)), for: .touchUpInside)
 
+        labelMessage.frame = CGRect(x: 40, y: Int(button1.frame.maxY) + 20, width: 300, height: 50)
+        labelMessage.text = "test"
+        labelMessage.backgroundColor = UIColor.cyan
+        self.view.addSubview(labelMessage)
+        
         tableView.frame = CGRect(
             x: 0,
-            y: statusBarHeight + 50 + button1.frame.height,
+            y: CGFloat(labelMessage.frame.maxY) + 20,
             width: self.view.frame.width,
-            height: self.view.frame.height - statusBarHeight
+            height: self.view.frame.height - labelMessage.frame.maxY - 20
         )
         self.view.addSubview(tableView)
         // Delegate設定
