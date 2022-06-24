@@ -95,7 +95,7 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
                 let groupsInOneContainer = try store.groups(matching: fetchPredicate)
                 if (groupsInOneContainer.count == 0) {
                     // コンテナの中にグループが存在しないタイプ（ex. Exchange）
-                    contactsFolders.append(ContactsFolder(folderType: .container, id: container.identifier, nameOfContainer: container.name, nameOfGroup: "グループ無し"))
+                    contactsFolders.append(ContactsFolder(folderType: .container, id: container.identifier, nameOfContainer: container.name, nameOfGroup: "グループが存在しないコンテナ"))
                 } else{
                     // コンテナの中にグループが存在するタイプ　（ex. icloudや端末ローカル）
                     for group in groupsInOneContainer {
@@ -125,8 +125,7 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // 一つ一つのセルを作る
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
-        cell.accessoryType = .checkmark
-//        cell.textLabel?.text = groupsArray[indexPath.row]
+        cell.accessoryType = .none
         cell.textLabel?.text = contactsFolders[indexPath.row].nameOfGroup
         cell.detailTextLabel?.text = contactsFolders[indexPath.row].nameOfContainer != "" ? contactsFolders[indexPath.row].nameOfContainer : "ローカル"
         return cell
@@ -136,8 +135,14 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
         // セルがタップされた時の処理
         print("タップされたセルのindex番号は: \(indexPath.row)")
         tableView.deselectRow(at: indexPath, animated: true)
-        
+        let cell = tableView.cellForRow(at: indexPath)
+        if (cell?.accessoryType == .checkmark) {
+            cell?.accessoryType = .none
+        }else{
+            cell?.accessoryType = .checkmark
+        }
     }
+
     
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
         // アクセサリボタン（セルの右にあるボタン）がタップされた時の処理
