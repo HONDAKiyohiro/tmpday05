@@ -124,10 +124,20 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // 一つ一つのセルを作る
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
+        //　let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
+        // 理由はわからないがネットに出ている上記の文だと素早くスクロールした時に
+        // セルの内容が不正なものになることがあったため、根拠ないけど以下のように変更した
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         cell.accessoryType = .none
         cell.textLabel?.text = contactsFolders[indexPath.row].nameOfGroup
         cell.detailTextLabel?.text = contactsFolders[indexPath.row].nameOfContainer != "" ? contactsFolders[indexPath.row].nameOfContainer : "ローカル"
+        if contactsFolders[indexPath.row].folderType == .container {
+            // コンテナ自体の削除は本アプリの対象外なので初めから選べないようにする
+            cell.isUserInteractionEnabled = false
+            cell.textLabel?.textColor = .lightGray
+            cell.detailTextLabel?.textColor = .lightGray
+            cell.contentView.alpha = 0.9
+        }
         return cell
     }
     
