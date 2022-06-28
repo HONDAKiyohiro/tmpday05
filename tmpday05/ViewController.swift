@@ -11,7 +11,7 @@ import Contacts
 class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSource{
 
     var containers: [CNContainer] = []
-    var groups: [CNGroup] = []
+//    var groups: [CNGroup] = []
     let tableView = UITableView()
     let button1 =  UIButton(type: UIButton.ButtonType.system)
     let labelMessage = UILabel()
@@ -26,6 +26,7 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
         var id: String
         var nameOfContainer: String
         var nameOfGroup: String
+        var shouldBeDeleted: Bool = false
     }
     var contactsFolders: [ContactsFolder] = []
     
@@ -79,6 +80,8 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
          contactstore1にアクセスして、各コンテナ内のグループを
          cellMainTitlesとcellSubTilesに設定する
         */
+        containers = []
+        contactsFolders = []
 
         let store = CNContactStore()
         do {
@@ -115,19 +118,24 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     @objc
     func deleteRecords(sender: Any){
         print("function deleteRecords is called")
+        // ここで選択されたセルに紐づいたグループ内の連絡先（とグループ自身）を削除する
+        for i in contactsFolders {
+            if i.shouldBeDeleted == true {
+                print("shouldBeDeleted is true in \(i.nameOfGroup)")
+            }
+        }
+        
+        // 削除が終わったら、グループ一覧を更新する
+        refreshGroupTable()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return groupsArray.count
         return contactsFolders.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // 一つ一つのセルを作る
-        //　let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
-        // 理由はわからないがネットに出ている上記の文だと素早くスクロールした時に
-        // セルの内容が不正なものになることがあったため、根拠ないけど以下のように変更した
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         cell.accessoryType = .none
         cell.textLabel?.text = contactsFolders[indexPath.row].nameOfGroup
         cell.detailTextLabel?.text = contactsFolders[indexPath.row].nameOfContainer != "" ? contactsFolders[indexPath.row].nameOfContainer : "ローカル"
@@ -148,8 +156,10 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
         let cell = tableView.cellForRow(at: indexPath)
         if (cell?.accessoryType == .checkmark) {
             cell?.accessoryType = .none
+            contactsFolders[indexPath.row].shouldBeDeleted = false
         }else{
             cell?.accessoryType = .checkmark
+            contactsFolders[indexPath.row].shouldBeDeleted = true
         }
     }
 
