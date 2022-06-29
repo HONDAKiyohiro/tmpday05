@@ -92,7 +92,7 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
         print("Number of containers is \(containers.count)")
         contactsFolders = []
         for container in containers {
-            print("container is \(container)")
+//            print("container is \(container)")
             let fetchPredicate = CNGroup.predicateForGroupsInContainer(withIdentifier: container.identifier)
             do {
                 let groupsInOneContainer = try store.groups(matching: fetchPredicate)
@@ -118,10 +118,31 @@ class ViewController: UIViewController , UITableViewDelegate, UITableViewDataSou
     @objc
     func deleteRecords(sender: Any){
         print("function deleteRecords is called")
+        let store = CNContactStore()
         // ここで選択されたセルに紐づいたグループ内の連絡先（とグループ自身）を削除する
-        for i in contactsFolders {
-            if i.shouldBeDeleted == true {
-                print("shouldBeDeleted is true in \(i.nameOfGroup)")
+        for folder in contactsFolders {
+            if folder.shouldBeDeleted == true {
+                print("shouldBeDeleted is true in \(folder.nameOfGroup)")
+                switch folder.folderType{
+                case .group:
+                    print("case .group")
+                
+                    
+                    
+                    var contactsInOneGroup: [CNContact] = []
+                    let fetchPredicate = CNContact.predicateForContactsInGroup(withIdentifier: folder.id)
+                    let keysToFetch = [CNContactIdentifierKey as CNKeyDescriptor, CNContactFormatter.descriptorForRequiredKeys(for: .fullName) as CNKeyDescriptor]
+                    do {
+                        contactsInOneGroup = try store.unifiedContacts(matching: fetchPredicate, keysToFetch: keysToFetch)
+                        print(contactsInOneGroup)
+                    } catch {
+                        print("Error fetching contacts in Group")
+                    }
+                case .voidGroup:
+                    print("case .voidGrup")
+                default:
+                    print("this case is not implemented yet.")
+                }
             }
         }
         
